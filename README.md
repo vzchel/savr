@@ -50,7 +50,7 @@ AI Integration: Claude Sonnet 4 API, Grok 4 API
 Development: JavaScript ES6+, Modern Hooks
 Deployment: GitHub Pages
 
-##Claude API Integration
+## Claude API Integration
 
 First, the AI Recipe Generator uses Claude to analyze your fridge inventory and generate creative, personalized recipes using only the items you currently have, Claude understands ingredient combinations, dietary restrictions, cooking skill levels, and dorm kitchen constraints to produce recipes you'd actually want to make. Second, the Meal Planning feature uses Claude to intelligently sequence meals across 3 days, prioritizing items expiring soonest so nothing goes to waste while ensuring nutritionally balanced meals. Third, we use Claude Vision to identify ingredients from fridge photos. when you upload an image, Claude analyzes it and extracts a list of identified items with quantities, which then populates your inventory. All Claude responses are structured as JSON, allowing recipe suggestions, meal plans, and ingredient lists to flow directly into the app's UI without additional processing
 
