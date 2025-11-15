@@ -1,70 +1,86 @@
-# Getting Started with Create React App
+# Savr: AI Foodwaste Prevention App for Cornell and Beyond
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Project Overview
 
-## Available Scripts
+Savr is an AI-powered app that prevents food waste through inventory management, Claude-generated recipes from items in your fridge, real-time surplus food sharing from dining halls and restaurants, calorie tracking, and a waste prevention counter. Track your fridge with image recognition or manual entry, get personalized meal plans that use expiring items first, claim surplus food that auto-adds to your inventory, and see exactly how many pounds of waste you've prevented. 
 
-In the project directory, you can run:
+## Installation/Setup Instructions
 
-### `npm start`
+You need:
+- Node.js 16+ and npm
+- Claude API access (provided via hackathon credits)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Running it locally: 
+1. Clone the repository:
+```bash
+git clone https://github.com/vzchel/savr.git
+cd savr
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+2. Install dependencies:
+```bash
+npm install react react-dom lucide-react
+```
 
-### `npm test`
+3. The Claude API is already integrated - no API key needed in artifacts!
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+4. Run the development server:
+```bash
+npm start
+```
 
-### `npm run build`
+5. Open http://localhost:3000 in your browser
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Usage Guide
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Getting Started: Open the app and you'll land on the "My Fridge" tab with an empty inventory. Start by either uploading a photo of your fridge (the app will identify items automatically) or manually adding items by searching and selecting from the dropdown menu. Specify quantities with unit options (grams, lbs, kg, servings) and set expiration dates.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Smart Recipes: Once you have items in your fridge, head to the "Smart Recipes" tab to see AI-generated recipes using only what you have, sorted by expiration urgency. Click any recipe to see detailed cooking instructions, nutritional facts, and ingredient quantities. Clicking "Cook This" will automatically deduct used items from your fridge inventory.
 
-### `npm run eject`
+Meal Planning: Go to the "Meal Plan" tab to generate a 3-day optimized meal plan that strategically uses expiring items first. Each meal is clickable to view full instructions and nutritional breakdowns, and you can cook meals directly from the plan, which updates your fridge automatically.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Surplus Food: Check the "Surplus Food" tab to browse real-time listings from Cornell dining halls, local restaurants, and other Savr users. When you find something you want, click "Claim" and it auto-adds to your fridge. You can manually set the expiration date if needed. Post your own surplus by clicking "Share Your Food" and filling in quick details like location, item type, and how long it's available.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Nutrition & Impact: Set your dietary restrictions in the "Preferences" tab (allergies, dietary needs), then use the "Calorie Calculator" to input your height, weight, age, sex, and activity level to get personalized daily calorie recommendations. Track your waste prevention progress in the "Impact" tab to see how many pounds of food you've saved and celebrate milestones.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Tech Stack
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Frontend: React, Tailwind CSS, Lucide Icons
+AI Integration: Claude Sonnet 4 API, Grok 4 API
+Development: JavaScript ES6+, Modern Hooks
+Deployment: GitHub Pages
 
-## Learn More
+##Claude API Integration
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+First, the AI Recipe Generator uses Claude to analyze your fridge inventory and generate creative, personalized recipes using only the items you currently have, Claude understands ingredient combinations, dietary restrictions, cooking skill levels, and dorm kitchen constraints to produce recipes you'd actually want to make. Second, the Meal Planning feature uses Claude to intelligently sequence meals across 3 days, prioritizing items expiring soonest so nothing goes to waste while ensuring nutritionally balanced meals. Third, we use Claude Vision to identify ingredients from fridge photos. when you upload an image, Claude analyzes it and extracts a list of identified items with quantities, which then populates your inventory. All Claude responses are structured as JSON, allowing recipe suggestions, meal plans, and ingredient lists to flow directly into the app's UI without additional processing
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Challenges & Solutions
 
-### Code Splitting
+Challenge 1: Computer Vision Image Recognition Accuracy
+Problem: The fridge image upload feature was identifying items incorrectly (always returning "apples and milk" regardless of actual contents), and uploading a new image wasn't clearing previous identifications.
+Solution: Retrained the Claude Vision prompts with more specific item identification guidelines and implemented a state reset function that clears previous items before processing new uploads. We also added a confirmation popup where users can manually verify and edit identified items before saving to fridge.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Challenge 2: Bulk Item Storage to Fridge
+Problem: When items were identified from fridge photos, only one item was being saved to "My Fridge" instead of all identified items.
+Solution: Refactored the backend storage logic to batch-process all identified items and save them as an array to the fridge inventory. Implemented proper error handling to ensure each item with its quantity and expiration date is individually stored.
 
-### Analyzing the Bundle Size
+Challenge 3: Dynamic Meal Plan Generation
+Problem: The meal plan feature wasn't generating recipes based on current fridge inventory—it was showing generic meals unrelated to available items, and the shopping cart wasn't suggesting items actually needed.
+Solution: Rebuilt the meal plan algorithm to first query current fridge contents, then pass that inventory to Claude for generation. Implemented logic that identifies missing ingredients and automatically populates the shopping cart with only items not currently in the fridge.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Challenge 4: Surplus Food Social Media Integration
+Problem: The surplus food feed was only displaying "leftover bagels from Trillium" with no variety in items or locations, making the feature feel static and unrealistic.
+Solution: Expanded the social media tracking keywords to include 50+ common food surplus terms (discount, leftover, free, available, expires, etc.) and integrated multiple dining hall accounts (Morrison, Okenshields, Becker, Willard Straight, etc.) plus local restaurant partners. Added dynamic location tags and item variety to make the feed feel authentic and useful.
 
-### Making a Progressive Web App
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Future Plans
 
-### Advanced Configuration
+In the short-term, we're fixing the remaining bugs with image recognition accuracy, completing the meal plan generation to work with current fridge items, and getting the share surplus button fully functional so the community features actually work seamlessly. Looking ahead over the next few months, we plan to partner with Cornell Dining Services to share anonymized surplus data so they can optimize what they prepare and reduce waste at the source, while integrating with Cornell's meal plan system so students see dining menus in-app and get recipe suggestions that complement daily offerings. We're also exploring barcode scanning for faster item entry and working with local food banks to create a donation system for unclaimed surplus food. To build community engagement, we'll add dorm-level waste prevention competitions with sustainability incentives through Residential Life partnerships and create an API for student sustainability organizations to embed Savr into their platforms. 
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Team Members & Contributions
 
-### Deployment
+Vachel Ng - Built the React component using CSS, Implemented Smart Fridge Inventory interface, Designed the Surplus Food tank UI and user interactions, Made the waste prevention counter
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Oishik Chakraborty - Developed backend infrastructure for data storage, integrated Claude API for recipe regeneration and meal planning, and Implemented calorie calculation
 
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Matthew Wang - Implemented the image recognition using Claude vision, built the dietary restriction system, and developed the surplus food social media tracking system
